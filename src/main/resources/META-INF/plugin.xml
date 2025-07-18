@@ -5,36 +5,53 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Mako - Android Drawable Exporter</name>
+    <name>Mako Android Drawable Importer</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="delacrixmorgan@gmail.com" url="https://github.com/delacrixmorgan">Delacrix Morgan</vendor>
+    <vendor email="delacrixmorgan@gmail.com" url="https://github.com/delacrixmorgan/mako-intellij">Delacrix Morgan
+    </vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-  ]]></description>
+  <p><strong>Still scaling images manually for Android? Seriously?!</strong></p>
+  <p>We couldn’t believe it either — it’s 2025 and Android Studio still doesn’t make importing xxxhdpi assets and scaling them down to <code>drawable-*</code> folders (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi) as effortless as a drag-and-drop.</p>
+
+  <p>Enter <em>Mako</em>: the humble, cheerful plugin that does exactly that! Just drop in your <strong>xxxhdpi</strong> asset, and let Mako scale it down into all the right Android density buckets — all using native Java libraries under the hood. No extra dependencies, just pure, reliable scaling magic.</p>
+
+  <p>✨ It even supports <strong>WebP</strong> (we know, rare right?). We wanted to do JPEG XL too, but hey, support is still catching up.</p>
+
+  <p>💻 Built for everyday Android devs. Simple UI. Zero fuss. Maximum satisfaction.</p>
+
+  <p>🌍 Localized in English, Chinese, Japanese, Spanish, and Brazilian Portuguese — because image scaling is a universal pain.</p>
+
+  <p>🪄 Oh, and did we mention? <strong>It’s open source</strong>! Star it, fork it, break it (but please open an issue 🙃):<br>
+  <a href="https://github.com/delacrixmorgan/mako-intellij">https://github.com/delacrixmorgan/mako-intellij</a></p>
+]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
     <actions>
-        <action
-                id="io.dontsayboj.mako.ExportImageToAndroidAction"
-                class="io.dontsayboj.mako.ExportImageToAndroidAction"
-                text="Export Android Drawable Resources"
-                description="Convert image to Android densities (mdpi to xxxhdpi)">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        <action id="io.dontsayboj.mako.ImportImageToAndroidFromFolder"
+                class="io.dontsayboj.mako.AndroidDrawableImporterAction"
+                icon="/drawable/ic_android.svg"
+                text="Mako Android Drawable Importer"
+                description="Import images from selected folder to Android drawable buckets">
+            <add-to-group group-id="ProjectViewPopupMenu"
+                          anchor="after"
+                          relative-to-action="CutCopyPasteGroup"/>
         </action>
     </actions>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
+        <notificationGroup id="Image Import Notifications"
+                           displayType="BALLOON"
+                           isLogByDefault="true"
+                           toolWindowId="Messages"/>
     </extensions>
 </idea-plugin>

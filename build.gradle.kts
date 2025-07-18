@@ -5,10 +5,16 @@ plugins {
 }
 
 group = "io.dontsayboj.mako"
-version = "0.0.1"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.10.1")
+    implementation("com.twelvemonkeys.imageio:imageio-core:3.10.1")
+    implementation("org.jetbrains:marketplace-zip-signer:0.1.38")
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -31,8 +37,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("241")
-        untilBuild.set("243.*")
+        sinceBuild.set("221")
+        untilBuild.set("")
     }
 
     signPlugin {
