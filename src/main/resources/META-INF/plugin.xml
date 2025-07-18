@@ -30,6 +30,12 @@
                 description="Convert image to Android densities (mdpi to xxxhdpi)">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+        <action id="io.dontsayboj.mako.ExportImageToAndroidFromFolder"
+                class="io.dontsayboj.mako.ExportImageToAndroidAction"
+                text="Export Images to Android Densities"
+                description="Export images from selected folder to Android drawable buckets">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
     </actions>
 
     <!-- Extension points defined by the plugin.

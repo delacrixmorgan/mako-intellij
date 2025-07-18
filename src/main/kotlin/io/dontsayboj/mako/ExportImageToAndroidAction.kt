@@ -3,6 +3,7 @@ package io.dontsayboj.mako
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
@@ -28,8 +29,10 @@ import javax.swing.table.TableCellRenderer
 import kotlin.math.roundToInt
 
 class ExportImageToAndroidAction : AnAction("Export Images to Android Densities") {
+
     override fun actionPerformed(e: AnActionEvent) {
-        val dialog = ImageExportDialog()
+        val selectedDir = e.getData(CommonDataKeys.VIRTUAL_FILE)?.path
+        val dialog = ImageExportDialog(selectedDir)
         if (dialog.showAndGet()) {
             val imageFiles = dialog.getDroppedFiles()
             val outputDir = dialog.getOutputDirectory()
@@ -65,16 +68,20 @@ class ExportImageToAndroidAction : AnAction("Export Images to Android Densities"
                     ImageIO.write(resized, "png", outputFile)
                 }
             }
-
             Messages.showInfoMessage(
                 "All images have been exported successfully.",
                 "Export Completed ✅",
             )
         }
     }
+
+    override fun update(e: AnActionEvent) {
+        val file = e.getData(CommonDataKeys.VIRTUAL_FILE)
+        e.presentation.isEnabledAndVisible = file?.isDirectory == true
+    }
 }
 
-class ImageExportDialog : DialogWrapper(true) {
+class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWrapper(true) {
     private val outputDirField = ExtendableTextField().apply {
         columns = 50
         emptyText.text = "Select output directory"
@@ -177,10 +184,8 @@ class ImageExportDialog : DialogWrapper(true) {
             }
         })
 
-        val basePath = ProjectManager.getInstance().openProjects.firstOrNull()?.basePath
-        basePath?.let {
-            outputDirField.text = it
-        }
+        outputDirField.text = prefillOutputDir ?: ProjectManager.getInstance()
+            .openProjects.firstOrNull()?.basePath.orEmpty()
     }
 
     override fun createCenterPanel(): JComponent = panel {
@@ -214,3 +219,4 @@ class ImageExportDialog : DialogWrapper(true) {
         }
     }
 }
+
