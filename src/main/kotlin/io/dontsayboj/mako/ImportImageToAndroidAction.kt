@@ -1,6 +1,8 @@
 package io.dontsayboj.mako
 
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -110,10 +112,15 @@ class ImportImageToAndroidAction : AnAction() {
                     ImageIO.write(resized, "png", outputFile)
                 }
             }
-            Messages.showInfoMessage(
-                "All images have been imported successfully.",
-                "Import Completed",
-            )
+            val project = e.project
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Image Import Notifications")
+                .createNotification(
+                    "Import Completed",
+                    "All images have been imported successfully.",
+                    NotificationType.INFORMATION
+                )
+                .notify(project)
         }
     }
 }
