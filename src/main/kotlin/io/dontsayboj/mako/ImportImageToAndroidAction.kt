@@ -155,13 +155,17 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 val images = data?.filterIsInstance<File>()?.filter {
                     it.extension.lowercase() in listOf("png", "jpg", "jpeg")
                 } ?: emptyList()
-                droppedFiles.clear()
-                droppedFiles.addAll(images)
+
+                val newFiles = images.filterNot { candidate ->
+                    droppedFiles.any { it.absolutePath == candidate.absolutePath }
+                }
+                droppedFiles.addAll(newFiles)
+
                 dropPanel.background = Color(200, 255, 200)
-                dropPanel.border = BorderFactory.createTitledBorder("${images.size} image(s) ready to import")
+                dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
 
                 tableModel.rowCount = 0
-                images.forEach { file ->
+                droppedFiles.forEach { file ->
                     val sizeKb = "%.2f KB".format(file.length() / 1024.0)
                     val buffered = ImageIO.read(file)
                     val imgIcon = if (buffered != null) {
@@ -186,12 +190,14 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     val files = chooser.selectedFiles.toList().filter {
                         it.extension.lowercase() in listOf("png", "jpg", "jpeg")
                     }
-                    droppedFiles.clear()
-                    droppedFiles.addAll(files)
+                    val newFiles = files.filterNot { candidate ->
+                        droppedFiles.any { it.absolutePath == candidate.absolutePath }
+                    }
+                    droppedFiles.addAll(newFiles)
                     dropPanel.background = Color(200, 255, 200)
-                    dropPanel.border = BorderFactory.createTitledBorder("${files.size} image(s) ready to import")
+                    dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
                     tableModel.rowCount = 0
-                    files.forEach { file ->
+                    droppedFiles.forEach { file ->
                         val sizeKb = "%.2f KB".format(file.length() / 1024.0)
                         val buffered = ImageIO.read(file)
                         val imgIcon = if (buffered != null) {
@@ -241,4 +247,3 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
         }
     }
 }
-
