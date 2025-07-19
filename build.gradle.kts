@@ -11,6 +11,11 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.10.1")
+    implementation("com.twelvemonkeys.imageio:imageio-core:3.10.1")
+}
+
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {

@@ -14,6 +14,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
+import com.twelvemonkeys.imageio.plugins.webp.WebPImageReaderSpi
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
@@ -24,6 +25,7 @@ import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import javax.imageio.spi.IIORegistry
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
@@ -33,6 +35,17 @@ class ImportImageToAndroidAction : AnAction() {
 
     override fun getActionUpdateThread(): ActionUpdateThread {
         return ActionUpdateThread.BGT
+    }
+
+    private fun registerWebPReaderIfNeeded() {
+        val registry = IIORegistry.getDefaultInstance()
+        val isRegistered = registry.getServiceProviders(javax.imageio.spi.ImageReaderSpi::class.java, true)
+            .asSequence()
+            .any { it.javaClass.name.contains("webp", ignoreCase = true) }
+
+        if (!isRegistered) {
+            registry.registerServiceProvider(WebPImageReaderSpi())
+        }
     }
 
     override fun update(e: AnActionEvent) {
@@ -58,6 +71,8 @@ class ImportImageToAndroidAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
+        registerWebPReaderIfNeeded()
+
         val selectedDir = e.getData(CommonDataKeys.VIRTUAL_FILE)?.path
         val dialog = ImageImportDialog(selectedDir)
         if (dialog.showAndGet()) {
@@ -104,6 +119,9 @@ class ImportImageToAndroidAction : AnAction() {
 }
 
 class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) {
+
+    private val supportedFileFormats by lazy { listOf("png", "jpg", "jpeg", "webp") }
+
     private val outputDirField = ExtendableTextField().apply {
         columns = 50
         emptyText.text = "Select output directory"
@@ -153,7 +171,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 evt.acceptDrop(DnDConstants.ACTION_COPY)
                 val data = evt.transferable.getTransferData(DataFlavor.javaFileListFlavor) as? List<*>
                 val images = data?.filterIsInstance<File>()?.filter {
-                    it.extension.lowercase() in listOf("png", "jpg", "jpeg")
+                    it.extension.lowercase() in supportedFileFormats
                 } ?: emptyList()
 
                 val newFiles = images.filterNot { candidate ->
@@ -188,7 +206,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 val result = chooser.showOpenDialog(null)
                 if (result == JFileChooser.APPROVE_OPTION) {
                     val files = chooser.selectedFiles.toList().filter {
-                        it.extension.lowercase() in listOf("png", "jpg", "jpeg")
+                        it.extension.lowercase() in supportedFileFormats
                     }
                     val newFiles = files.filterNot { candidate ->
                         droppedFiles.any { it.absolutePath == candidate.absolutePath }
