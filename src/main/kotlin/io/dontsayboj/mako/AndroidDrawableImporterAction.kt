@@ -7,9 +7,15 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.fileChooser.FileChooser
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.fields.ExtendableTextComponent
 import com.intellij.ui.components.fields.ExtendableTextField
 import com.intellij.ui.dsl.builder.Align
@@ -149,11 +155,10 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 "Browse",
             ) {
                 val projectBase = ProjectManager.getInstance().openProjects.firstOrNull()?.basePath ?: return@create
-                val chooser = JFileChooser(File(projectBase)).apply {
-                    fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-                }
-                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    text = chooser.selectedFile.absolutePath
+                val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                val toSelect = VfsUtil.findFile(File(projectBase).toPath(), true)
+                FileChooser.chooseFile(descriptor, null as Project?, null as Component?, toSelect) { file: VirtualFile ->
+                    text = file.path
                 }
             }
         )
@@ -200,7 +205,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     dropPanel.background = Theme.errorBackground
                     dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
                 }
-                dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
+                dropPanel.repaint()
 
                 tableModel.rowCount = 0
                 droppedFiles.forEach { file ->
@@ -213,21 +218,16 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     }
                     tableModel.addRow(arrayOf(imgIcon, file.name, sizeKb, file.parent))
                 }
-
-                dropPanel.repaint()
             }
         }
 
         dropPanel.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                val chooser = JFileChooser(File(System.getProperty("user.home") + "/Desktop"))
-                chooser.fileSelectionMode = JFileChooser.FILES_ONLY
-                chooser.isMultiSelectionEnabled = true
-                val result = chooser.showOpenDialog(null)
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    val files = chooser.selectedFiles.toList().filter {
-                        it.extension.lowercase() in supportedFileFormats
-                    }
+                val descriptor = FileChooserDescriptorFactory.createMultipleFilesNoJarsDescriptor()
+                    .withFileFilter { it.extension?.lowercase() in supportedFileFormats }
+                val toSelect = VfsUtil.findFile(File(System.getProperty("user.home") + "/Desktop").toPath(), true)
+                FileChooser.chooseFiles(descriptor, null as Project?, null as Component?, toSelect) { selectedFiles ->
+                    val files = selectedFiles.map { VfsUtilCore.virtualToIoFile(it) }
                     val newFiles = files.filterNot { candidate ->
                         droppedFiles.any { it.absolutePath == candidate.absolutePath }
                     }
@@ -239,8 +239,8 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                         dropPanel.background = Theme.errorBackground
                         dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
                     }
+                    dropPanel.repaint()
 
-                    dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
                     tableModel.rowCount = 0
                     droppedFiles.forEach { file ->
                         val sizeKb = "%.2f KB".format(file.length() / 1024.0)
@@ -252,7 +252,6 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                         }
                         tableModel.addRow(arrayOf(imgIcon, file.name, sizeKb, file.parent))
                     }
-                    dropPanel.repaint()
                 }
             }
         })
