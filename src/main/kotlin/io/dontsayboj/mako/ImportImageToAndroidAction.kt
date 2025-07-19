@@ -28,11 +28,11 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
 import kotlin.math.roundToInt
 
-class ExportImageToAndroidAction : AnAction("Export Images to Android Densities") {
+class ImportImageToAndroidAction : AnAction("Import Images to Android Densities") {
 
     override fun actionPerformed(e: AnActionEvent) {
         val selectedDir = e.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        val dialog = ImageExportDialog(selectedDir)
+        val dialog = ImageImportDialog(selectedDir)
         if (dialog.showAndGet()) {
             val imageFiles = dialog.getDroppedFiles()
             val outputDir = dialog.getOutputDirectory()
@@ -69,19 +69,36 @@ class ExportImageToAndroidAction : AnAction("Export Images to Android Densities"
                 }
             }
             Messages.showInfoMessage(
-                "All images have been exported successfully.",
-                "Export Completed ✅",
+                "All images have been imported successfully.",
+                "Import Completed",
             )
         }
     }
 
     override fun update(e: AnActionEvent) {
         val file = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        e.presentation.isEnabledAndVisible = file?.isDirectory == true
+        val project = e.project
+
+        val basePath = project?.basePath
+        val baseDir = basePath?.let {
+            com.intellij.openapi.vfs.LocalFileSystem.getInstance().findFileByPath(it)
+        }
+
+        val isAndroidProject = listOf(
+            "build.gradle", "build.gradle.kts",
+            "settings.gradle", "settings.gradle.kts"
+        ).any { fileName -> baseDir?.findChild(fileName) != null }
+
+        val isDrawableFolder = file?.isDirectory == true &&
+                file.name.startsWith("drawable") &&
+                file.path.contains("/res/drawable")
+
+        e.presentation.isVisible = isAndroidProject && isDrawableFolder
+        e.presentation.isEnabled = e.presentation.isVisible
     }
 }
 
-class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWrapper(true) {
+class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) {
     private val outputDirField = ExtendableTextField().apply {
         columns = 50
         emptyText.text = "Select output directory"
@@ -106,7 +123,7 @@ class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWr
     private val dropPanel = JPanel(BorderLayout()).apply {
         minimumSize = Dimension(0, 150)
     }
-    private val tableModel = DefaultTableModel(arrayOf("Preview", "Filename", "Size", "Directory"), 0)
+    private val tableModel = DefaultTableModel(arrayOf("Preview", "Filename", "Size", "Path Directory"), 0)
     private val table = JBTable(tableModel).apply {
         rowHeight = 40
         autoResizeMode = JBTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS
@@ -119,7 +136,7 @@ class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWr
 
     init {
         init()
-        title = "Batch Export Images to Android Densities"
+        title = "Batch Import Images to Android Densities"
 
         val instructionLabel = JLabel("Drag and drop PNG, JPG, or JPEG files here", SwingConstants.CENTER)
         dropPanel.border = BorderFactory.createTitledBorder("Drop images here")
@@ -136,9 +153,9 @@ class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWr
                 droppedFiles.clear()
                 droppedFiles.addAll(images)
                 dropPanel.background = Color(200, 255, 200)
-                dropPanel.border = BorderFactory.createTitledBorder("${images.size} image(s) ready to export")
+                dropPanel.border = BorderFactory.createTitledBorder("${images.size} image(s) ready to import")
 
-                tableModel.setRowCount(0)
+                tableModel.rowCount = 0
                 images.forEach { file ->
                     val sizeKb = "%.2f KB".format(file.length() / 1024.0)
                     val buffered = ImageIO.read(file)
@@ -167,8 +184,8 @@ class ImageExportDialog(private val prefillOutputDir: String? = null) : DialogWr
                     droppedFiles.clear()
                     droppedFiles.addAll(files)
                     dropPanel.background = Color(200, 255, 200)
-                    dropPanel.border = BorderFactory.createTitledBorder("${files.size} image(s) ready to export")
-                    tableModel.setRowCount(0)
+                    dropPanel.border = BorderFactory.createTitledBorder("${files.size} image(s) ready to import")
+                    tableModel.rowCount = 0
                     files.forEach { file ->
                         val sizeKb = "%.2f KB".format(file.length() / 1024.0)
                         val buffered = ImageIO.read(file)
