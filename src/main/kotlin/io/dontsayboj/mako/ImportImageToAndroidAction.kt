@@ -108,8 +108,13 @@ class ImportImageToAndroidAction : AnAction() {
 
                     val bucketDir = File(outputDir, "drawable-$bucket")
                     bucketDir.mkdirs()
-                    val outputFile = File(bucketDir, "$baseName.png")
-                    ImageIO.write(resized, "png", outputFile)
+                    val originalFormat = imageFile.extension.lowercase()
+                    val format = when {
+                        ImageIO.getImageWritersByFormatName(originalFormat).hasNext() -> originalFormat
+                        else -> "png"
+                    }
+                    val outputFile = File(bucketDir, "$baseName.$format")
+                    ImageIO.write(resized, format, outputFile)
                 }
             }
             val project = e.project
@@ -186,7 +191,13 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 }
                 droppedFiles.addAll(newFiles)
 
-                dropPanel.background = Color(200, 255, 200)
+                if (images.isNotEmpty()) {
+                    dropPanel.background = Color(200, 255, 200)
+                    dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
+                } else {
+                    dropPanel.background = Color(255, 200, 200)
+                    dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
+                }
                 dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
 
                 tableModel.rowCount = 0
@@ -219,7 +230,14 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                         droppedFiles.any { it.absolutePath == candidate.absolutePath }
                     }
                     droppedFiles.addAll(newFiles)
-                    dropPanel.background = Color(200, 255, 200)
+                    if (files.isNotEmpty()) {
+                        dropPanel.background = Color(200, 255, 200)
+                        dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
+                    } else {
+                        dropPanel.background = Color(255, 200, 200)
+                        dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
+                    }
+
                     dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
                     tableModel.rowCount = 0
                     droppedFiles.forEach { file ->
