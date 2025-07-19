@@ -1,6 +1,7 @@
 package io.dontsayboj.mako
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -28,7 +29,33 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
 import kotlin.math.roundToInt
 
-class ImportImageToAndroidAction : AnAction("Import Images to Android Densities") {
+class ImportImageToAndroidAction : AnAction() {
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
+
+    override fun update(e: AnActionEvent) {
+        val file = e.getData(CommonDataKeys.VIRTUAL_FILE)
+        val project = e.project
+
+        val basePath = project?.basePath
+        val baseDir = basePath?.let {
+            com.intellij.openapi.vfs.LocalFileSystem.getInstance().findFileByPath(it)
+        }
+
+        val isAndroidProject = listOf(
+            "build.gradle", "build.gradle.kts",
+            "settings.gradle", "settings.gradle.kts"
+        ).any { fileName -> baseDir?.findChild(fileName) != null }
+
+        val isDrawableFolder = file?.isDirectory == true &&
+                file.name.startsWith("drawable") &&
+                file.path.contains("/res/drawable")
+
+        e.presentation.isVisible = isAndroidProject && isDrawableFolder
+        e.presentation.isEnabled = e.presentation.isVisible
+    }
 
     override fun actionPerformed(e: AnActionEvent) {
         val selectedDir = e.getData(CommonDataKeys.VIRTUAL_FILE)?.path
@@ -73,28 +100,6 @@ class ImportImageToAndroidAction : AnAction("Import Images to Android Densities"
                 "Import Completed",
             )
         }
-    }
-
-    override fun update(e: AnActionEvent) {
-        val file = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        val project = e.project
-
-        val basePath = project?.basePath
-        val baseDir = basePath?.let {
-            com.intellij.openapi.vfs.LocalFileSystem.getInstance().findFileByPath(it)
-        }
-
-        val isAndroidProject = listOf(
-            "build.gradle", "build.gradle.kts",
-            "settings.gradle", "settings.gradle.kts"
-        ).any { fileName -> baseDir?.findChild(fileName) != null }
-
-        val isDrawableFolder = file?.isDirectory == true &&
-                file.name.startsWith("drawable") &&
-                file.path.contains("/res/drawable")
-
-        e.presentation.isVisible = isAndroidProject && isDrawableFolder
-        e.presentation.isEnabled = e.presentation.isVisible
     }
 }
 
