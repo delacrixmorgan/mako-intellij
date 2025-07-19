@@ -17,7 +17,11 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import com.twelvemonkeys.imageio.plugins.webp.WebPImageReaderSpi
-import java.awt.*
+import io.dontsayboj.mako.ui.Theme
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.Image
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -33,7 +37,7 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellRenderer
 import kotlin.math.roundToInt
 
-class ImportImageToAndroidAction : AnAction() {
+class AndroidDrawableImporterAction : AnAction() {
 
     override fun getActionUpdateThread(): ActionUpdateThread {
         return ActionUpdateThread.BGT
@@ -64,11 +68,11 @@ class ImportImageToAndroidAction : AnAction() {
             "settings.gradle", "settings.gradle.kts"
         ).any { fileName -> baseDir?.findChild(fileName) != null }
 
-        val isDrawableFolder = file?.isDirectory == true &&
-                file.name.startsWith("drawable") &&
-                file.path.contains("/res/drawable")
+        val isResFolder = file?.isDirectory == true &&
+                file.name.startsWith("res") &&
+                file.path.contains("/res")
 
-        e.presentation.isVisible = isAndroidProject && isDrawableFolder
+        e.presentation.isVisible = isAndroidProject && isResFolder
         e.presentation.isEnabled = e.presentation.isVisible
     }
 
@@ -121,8 +125,8 @@ class ImportImageToAndroidAction : AnAction() {
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Image Import Notifications")
                 .createNotification(
-                    "Import Completed",
-                    "All images have been imported successfully.",
+                    "Mako",
+                    "${imageFiles.size} image(s) have been imported successfully.",
                     NotificationType.INFORMATION
                 )
                 .notify(project)
@@ -171,13 +175,11 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
 
     init {
         init()
-        title = "Batch Import Images to Android Densities"
+        title = "Mako - Android Drawable Importer"
 
-        val instructionLabel = JLabel("Drag and drop PNG, JPG, or JPEG files here", SwingConstants.CENTER)
+        val instructionLabel = JLabel("Drag and drop PNG, JPG, JPEG or WEBP files here", SwingConstants.CENTER)
         dropPanel.border = BorderFactory.createTitledBorder("Drop images here")
-        dropPanel.background = Color(240, 240, 240)
         dropPanel.add(instructionLabel, BorderLayout.CENTER)
-
         dropPanel.dropTarget = object : DropTarget() {
             override fun drop(evt: DropTargetDropEvent) {
                 evt.acceptDrop(DnDConstants.ACTION_COPY)
@@ -192,10 +194,10 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 droppedFiles.addAll(newFiles)
 
                 if (images.isNotEmpty()) {
-                    dropPanel.background = Color(200, 255, 200)
+                    dropPanel.background = Theme.successBackground
                     dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
                 } else {
-                    dropPanel.background = Color(255, 200, 200)
+                    dropPanel.background = Theme.errorBackground
                     dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
                 }
                 dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
@@ -231,10 +233,10 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     }
                     droppedFiles.addAll(newFiles)
                     if (files.isNotEmpty()) {
-                        dropPanel.background = Color(200, 255, 200)
+                        dropPanel.background = Theme.successBackground
                         dropPanel.border = BorderFactory.createTitledBorder("${droppedFiles.size} image(s) ready to import")
                     } else {
-                        dropPanel.background = Color(255, 200, 200)
+                        dropPanel.background = Theme.errorBackground
                         dropPanel.border = BorderFactory.createTitledBorder("Unsupported file format dropped")
                     }
 

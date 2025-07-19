@@ -24,9 +24,9 @@
 
     <actions>
         <action id="io.dontsayboj.mako.ImportImageToAndroidFromFolder"
-                class="io.dontsayboj.mako.ImportImageToAndroidAction"
+                class="io.dontsayboj.mako.AndroidDrawableImporterAction"
                 icon="/drawable/ic_android.svg"
-                text="Import Images"
+                text="Mako Android Drawable Importer"
                 description="Import images from selected folder to Android drawable buckets">
             <add-to-group group-id="ProjectViewPopupMenu"
                           anchor="after"
