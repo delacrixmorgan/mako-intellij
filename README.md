@@ -51,7 +51,7 @@ Drag in your `xxxhdpi` image(s) — and you’re done.
 
 **Option 2 - Manual Installation via ZIP**
 
-[Click here](https://github.com/delacrixmorgan/mako-intellij/release/download/mako-1.0.0.zip) to download the ZIP.
+[Click here](https://github.com/delacrixmorgan/mako-intellij/release/download/mako-1.0.1.zip) to download the ZIP.
 
 ## 🧪 Supported Image Formats
 
