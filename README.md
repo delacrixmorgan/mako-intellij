@@ -4,6 +4,8 @@
 
 > Still manually scaling images for Android drawable folders? Come on now. Mako is here to help.
 
+![screenshot_overview](screenshots/0_overview.gif)
+
 ## ✨ What Is This?
 
 Mako is a no-nonsense, drag-and-drop image importer plugin for Android Studio and IntelliJ IDEA.  
