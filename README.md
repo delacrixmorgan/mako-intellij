@@ -6,6 +6,10 @@
 
 ![screenshot_overview](screenshots/0_overview.gif)
 
+## ✏️ Article
+
+- [The Android Plugin I Couldn’t Live Without — So I Rebuilt It from Scratch](https://medium.com/bugless/the-android-plugin-i-couldnt-live-without-so-i-rebuilt-it-from-scratch-73adda89ddd3)
+
 ## ✨ What Is This?
 
 Mako is a no-nonsense, drag-and-drop image importer plugin for Android Studio and IntelliJ IDEA.  
