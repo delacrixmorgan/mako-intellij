@@ -14,7 +14,6 @@ repositories {
 dependencies {
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.10.1")
     implementation("com.twelvemonkeys.imageio:imageio-core:3.10.1")
-    implementation("org.jetbrains:marketplace-zip-signer:0.1.38")
 }
 
 // Configure Gradle IntelliJ Plugin
