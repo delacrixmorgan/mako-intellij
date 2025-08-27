@@ -40,7 +40,11 @@ class AndroidDrawableImporterAction : AnAction() {
                 file.name.startsWith("res") &&
                 file.path.contains("/res")
 
-        e.presentation.isVisible = isAndroidProject && isResFolder
+        val isDrawableFolder = file?.isDirectory == true &&
+                file.name.startsWith("drawable") &&
+                file.path.contains("/drawable")
+
+        e.presentation.isVisible = isAndroidProject && (isResFolder || isDrawableFolder)
         e.presentation.isEnabled = e.presentation.isVisible
     }
 

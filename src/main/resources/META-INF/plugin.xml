@@ -43,6 +43,8 @@
             <add-to-group group-id="ProjectViewPopupMenu"
                           anchor="after"
                           relative-to-action="CutCopyPasteGroup"/>
+
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
 
