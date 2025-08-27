@@ -18,10 +18,7 @@ import com.intellij.util.ui.JBUI
 import io.dontsayboj.mako.model.supportedFileFormats
 import io.dontsayboj.mako.ui.Bundle
 import io.dontsayboj.mako.ui.Theme
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Dimension
-import java.awt.Image
+import java.awt.*
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -83,6 +80,38 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
         columnModel.getColumn(0).preferredWidth = 40
         columnModel.getColumn(1).preferredWidth = 150
         columnModel.getColumn(2).preferredWidth = 100
+
+        setDefaultEditor(Object::class.java, null)
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2 && selectedRow != -1) {
+                    val filePath = tableModel.getValueAt(selectedRow, 3)?.toString()
+                    val fileName = tableModel.getValueAt(selectedRow, 1)?.toString()
+                    val file = droppedFiles.find { it.parent == filePath && it.name == fileName }
+                    if (file != null && file.exists()) {
+                        try {
+                            if (Desktop.isDesktopSupported()) {
+                                Desktop.getDesktop().open(file)
+                            } else {
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    Bundle.message("dialog.label.previewErrorDescriptionDesktopNotSupported"),
+                                    Bundle.message("dialog.label.previewErrorTitle"),
+                                    JOptionPane.ERROR_MESSAGE
+                                )
+                            }
+                        } catch (ex: Exception) {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                Bundle.message("dialog.label.previewErrorDescriptionUnableToOpen", file.name, ex.message.toString()),
+                                Bundle.message("dialog.label.previewErrorTitle"),
+                                JOptionPane.ERROR_MESSAGE
+                            )
+                        }
+                    }
+                }
+            }
+        })
     }
 
     init {
