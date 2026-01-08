@@ -9,7 +9,10 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.ui.Messages
 import com.twelvemonkeys.imageio.plugins.webp.WebPImageReaderSpi
 import io.dontsayboj.mako.model.FileFormat
+import io.dontsayboj.mako.model.ResizeAlgorithm
 import io.dontsayboj.mako.ui.Bundle
+import net.coobird.thumbnailator.Thumbnails
+import org.imgscalr.Scalr
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -57,6 +60,7 @@ class AndroidDrawableImporterAction : AnAction() {
             val imageFiles = dialog.getDroppedFiles()
             val outputDir = dialog.getOutputDirectory()
             val modifier = dialog.getModifier()
+            val algorithm = dialog.getAlgorithm()
 
             if (imageFiles.isEmpty()) {
                 Messages.showErrorDialog(
@@ -81,10 +85,24 @@ class AndroidDrawableImporterAction : AnAction() {
                 scales.forEach { (bucket, scale) ->
                     val scaledWidth = (image.width * scale).roundToInt()
                     val scaledHeight = (image.height * scale).roundToInt()
-                    val resized = BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB)
-                    val g2d = resized.createGraphics()
-                    g2d.drawImage(image, 0, 0, scaledWidth, scaledHeight, null)
-                    g2d.dispose()
+                    val resized = when (algorithm) {
+                        ResizeAlgorithm.NATIVE -> {
+                            val bufferedImage = BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB)
+                            val g2d = bufferedImage.createGraphics()
+                            g2d.drawImage(image, 0, 0, scaledWidth, scaledHeight, null)
+                            g2d.dispose()
+                            bufferedImage
+                        }
+
+                        ResizeAlgorithm.THUMBNAILATOR -> {
+                            Thumbnails.of(image).size(scaledWidth, scaledHeight).asBufferedImage()
+                        }
+
+                        ResizeAlgorithm.IMGSCALR -> {
+                            Scalr.resize(image, Scalr.Method.QUALITY, scaledWidth, scaledHeight)
+                        }
+                    }
+
 
                     val suffix = if (modifier.isNotBlank()) "-${modifier.lowercase()}" else ""
                     val bucketDir = File(outputDir, "drawable$suffix-$bucket")
