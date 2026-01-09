@@ -86,23 +86,20 @@ class AndroidDrawableImporterAction : AnAction() {
                     val scaledWidth = (image.width * scale).roundToInt()
                     val scaledHeight = (image.height * scale).roundToInt()
                     val resized = when (algorithm) {
-                        ResizeAlgorithm.NATIVE -> {
+                        ResizeAlgorithm.Native -> {
                             val bufferedImage = BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB)
                             val g2d = bufferedImage.createGraphics()
                             g2d.drawImage(image, 0, 0, scaledWidth, scaledHeight, null)
                             g2d.dispose()
                             bufferedImage
                         }
-
-                        ResizeAlgorithm.THUMBNAILATOR -> {
+                        ResizeAlgorithm.Thumbnailator -> {
                             Thumbnails.of(image).size(scaledWidth, scaledHeight).asBufferedImage()
                         }
-
-                        ResizeAlgorithm.IMGSCALR -> {
+                        ResizeAlgorithm.Imgscalr -> {
                             Scalr.resize(image, Scalr.Method.QUALITY, scaledWidth, scaledHeight)
                         }
                     }
-
 
                     val suffix = if (modifier.isNotBlank()) "-${modifier.lowercase()}" else ""
                     val bucketDir = File(outputDir, "drawable$suffix-$bucket")

@@ -1,7 +1,7 @@
 package io.dontsayboj.mako.model
 
 enum class ResizeAlgorithm {
-    NATIVE,
-    THUMBNAILATOR,
-    IMGSCALR,
+    Native,
+    Thumbnailator,
+    Imgscalr,
 }

@@ -162,8 +162,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     )
                 } else {
                     dropPanel.background = Theme.errorBackground
-                    dropPanel.border =
-                        BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
+                    dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
                 }
                 dropPanel.repaint()
 
@@ -202,8 +201,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                         )
                     } else {
                         dropPanel.background = Theme.errorBackground
-                        dropPanel.border =
-                            BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
+                        dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
                     }
                     dropPanel.repaint()
 
@@ -278,10 +276,10 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
     fun getModifier(): String = modifierField.text.trim()
 
     fun getAlgorithm(): ResizeAlgorithm = when (algorithmDropdown.selectedIndex) {
-        0 -> ResizeAlgorithm.NATIVE
-        1 -> ResizeAlgorithm.THUMBNAILATOR
-        2 -> ResizeAlgorithm.IMGSCALR
-        else -> ResizeAlgorithm.NATIVE
+        0 -> ResizeAlgorithm.Native
+        1 -> ResizeAlgorithm.Thumbnailator
+        2 -> ResizeAlgorithm.Imgscalr
+        else -> ResizeAlgorithm.Native
     }
 
     private class ImageRenderer : TableCellRenderer {
