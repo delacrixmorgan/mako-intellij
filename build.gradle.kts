@@ -17,6 +17,8 @@ repositories {
 dependencies {
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
     implementation("com.twelvemonkeys.imageio:imageio-core:3.12.0")
+    implementation("net.coobird:thumbnailator:0.4.21")
+    implementation("org.imgscalr:imgscalr-lib:4.2")
 
     intellijPlatform {
         intellijIdeaCommunity("2024.1.7")

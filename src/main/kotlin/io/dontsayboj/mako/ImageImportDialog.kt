@@ -15,6 +15,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
+import io.dontsayboj.mako.model.ResizeAlgorithm
 import io.dontsayboj.mako.model.supportedFileFormats
 import io.dontsayboj.mako.ui.Bundle
 import io.dontsayboj.mako.ui.Theme
@@ -49,7 +50,12 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                 val projectBase = ProjectManager.getInstance().openProjects.firstOrNull()?.basePath ?: return@create
                 val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
                 val toSelect = VfsUtil.findFile(File(projectBase).toPath(), true)
-                FileChooser.chooseFile(descriptor, null as Project?, null as Component?, toSelect) { file: VirtualFile ->
+                FileChooser.chooseFile(
+                    descriptor,
+                    null as Project?,
+                    null as Component?,
+                    toSelect
+                ) { file: VirtualFile ->
                     text = file.path
                 }
             }
@@ -65,6 +71,13 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
     private val dropPanel = JPanel(BorderLayout()).apply {
         minimumSize = Dimension(0, 150)
     }
+    private val algorithmDropdown = JComboBox(
+        arrayOf(
+            Bundle.message("dialog.label.algorithm.native"),
+            Bundle.message("dialog.label.algorithm.thumbnailator"),
+            Bundle.message("dialog.label.algorithm.imgscalr"),
+        )
+    )
     private val tableModel = DefaultTableModel(
         arrayOf(
             Bundle.message("dialog.label.tableRowPreview"),
@@ -103,7 +116,11 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                         } catch (ex: Exception) {
                             JOptionPane.showMessageDialog(
                                 null,
-                                Bundle.message("dialog.label.previewErrorDescriptionUnableToOpen", file.name, ex.message.toString()),
+                                Bundle.message(
+                                    "dialog.label.previewErrorDescriptionUnableToOpen",
+                                    file.name,
+                                    ex.message.toString()
+                                ),
                                 Bundle.message("dialog.label.previewErrorTitle"),
                                 JOptionPane.ERROR_MESSAGE
                             )
@@ -137,7 +154,12 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
 
                 if (images.isNotEmpty()) {
                     dropPanel.background = Theme.successBackground
-                    dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.imagesReadyToImport", droppedFiles.size))
+                    dropPanel.border = BorderFactory.createTitledBorder(
+                        Bundle.message(
+                            "dialog.label.imagesReadyToImport",
+                            droppedFiles.size
+                        )
+                    )
                 } else {
                     dropPanel.background = Theme.errorBackground
                     dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
@@ -171,7 +193,12 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     droppedFiles.addAll(newFiles)
                     if (files.isNotEmpty()) {
                         dropPanel.background = Theme.successBackground
-                        dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.imagesReadyToImport", droppedFiles.size))
+                        dropPanel.border = BorderFactory.createTitledBorder(
+                            Bundle.message(
+                                "dialog.label.imagesReadyToImport",
+                                droppedFiles.size
+                            )
+                        )
                     } else {
                         dropPanel.background = Theme.errorBackground
                         dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.unsupportedFileFormat"))
@@ -207,7 +234,12 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
                     droppedFiles.removeIf { it.parent == filePath && it.name == fileName }
                     tableModel.removeRow(rowIndex)
                 }
-                dropPanel.border = BorderFactory.createTitledBorder(Bundle.message("dialog.label.imagesReadyToImport", droppedFiles.size))
+                dropPanel.border = BorderFactory.createTitledBorder(
+                    Bundle.message(
+                        "dialog.label.imagesReadyToImport",
+                        droppedFiles.size
+                    )
+                )
                 dropPanel.background = Theme.defaultBackground
                 dropPanel.repaint()
             }
@@ -227,6 +259,9 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
         row {
             cell(dropPanel).resizableColumn().align(Align.FILL)
         }
+        row(Bundle.message("dialog.label.algorithm")) {
+            cell(algorithmDropdown).resizableColumn().align(Align.FILL)
+        }
         row {
             cell(JScrollPane(table).apply {
                 preferredSize = Dimension(0, 200)
@@ -239,6 +274,13 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
     fun getOutputDirectory(): File = File(outputDirField.text)
 
     fun getModifier(): String = modifierField.text.trim()
+
+    fun getAlgorithm(): ResizeAlgorithm = when (algorithmDropdown.selectedIndex) {
+        0 -> ResizeAlgorithm.Native
+        1 -> ResizeAlgorithm.Thumbnailator
+        2 -> ResizeAlgorithm.Imgscalr
+        else -> ResizeAlgorithm.Native
+    }
 
     private class ImageRenderer : TableCellRenderer {
         override fun getTableCellRendererComponent(
