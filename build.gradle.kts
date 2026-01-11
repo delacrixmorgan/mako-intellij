@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.dontsayboj.mako"
-version = "1.0.2"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -15,13 +15,13 @@ repositories {
 }
 
 dependencies {
-    implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
-    implementation("com.twelvemonkeys.imageio:imageio-core:3.12.0")
-    implementation("net.coobird:thumbnailator:0.4.21")
-    implementation("org.imgscalr:imgscalr-lib:4.2")
+    implementation("com.twelvemonkeys.imageio:imageio-webp:3.13.0")
+    implementation("com.twelvemonkeys.imageio:imageio-core:3.13.0")
+    implementation("net.coobird:thumbnailator:0.4.21") // https://github.com/coobird/thumbnailator/tags
+    implementation("org.imgscalr:imgscalr-lib:4.2") // https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib
 
     intellijPlatform {
-        intellijIdeaCommunity("2024.1.7")
+        intellijIdeaCommunity("2024.3")
         instrumentationTools()
     }
 }
@@ -37,7 +37,7 @@ intellijPlatform {
             url = "https://github.com/delacrixmorgan/mako-intellij"
         }
         ideaVersion {
-            sinceBuild = "241"
+            sinceBuild = "243"
             untilBuild = provider { null }
         }
     }
