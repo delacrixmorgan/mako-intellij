@@ -5,6 +5,7 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -71,12 +72,10 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
     private val dropPanel = JPanel(BorderLayout()).apply {
         minimumSize = Dimension(0, 150)
     }
-    private val algorithmDropdown = JComboBox(
-        arrayOf(
-            Bundle.message("dialog.label.algorithm.native"),
-            Bundle.message("dialog.label.algorithm.thumbnailator"),
-            Bundle.message("dialog.label.algorithm.imgscalr"),
-        )
+    private val algorithmDropdown = ComboBox(
+        ResizeAlgorithm.entries.map {
+            Bundle.message(it.getLabelRes())
+        }.toTypedArray()
     )
     private val tableModel = DefaultTableModel(
         arrayOf(
@@ -275,12 +274,7 @@ class ImageImportDialog(prefillOutputDir: String? = null) : DialogWrapper(true) 
 
     fun getModifier(): String = modifierField.text.trim()
 
-    fun getAlgorithm(): ResizeAlgorithm = when (algorithmDropdown.selectedIndex) {
-        0 -> ResizeAlgorithm.Native
-        1 -> ResizeAlgorithm.Thumbnailator
-        2 -> ResizeAlgorithm.Imgscalr
-        else -> ResizeAlgorithm.Native
-    }
+    fun getResizeAlgorithm(): ResizeAlgorithm = ResizeAlgorithm.entries.getOrNull(algorithmDropdown.selectedIndex) ?: ResizeAlgorithm.Imgscalr
 
     private class ImageRenderer : TableCellRenderer {
         override fun getTableCellRendererComponent(
