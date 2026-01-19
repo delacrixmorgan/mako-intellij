@@ -60,7 +60,7 @@ class AndroidDrawableImporterAction : AnAction() {
             val imageFiles = dialog.getDroppedFiles()
             val outputDir = dialog.getOutputDirectory()
             val modifier = dialog.getModifier()
-            val algorithm = dialog.getAlgorithm()
+            val algorithm = dialog.getResizeAlgorithm()
 
             if (imageFiles.isEmpty()) {
                 Messages.showErrorDialog(
@@ -86,18 +86,18 @@ class AndroidDrawableImporterAction : AnAction() {
                     val scaledWidth = (image.width * scale).roundToInt()
                     val scaledHeight = (image.height * scale).roundToInt()
                     val resized = when (algorithm) {
+                        ResizeAlgorithm.Imgscalr -> {
+                            Scalr.resize(image, Scalr.Method.QUALITY, scaledWidth, scaledHeight)
+                        }
+                        ResizeAlgorithm.Thumbnailator -> {
+                            Thumbnails.of(image).size(scaledWidth, scaledHeight).asBufferedImage()
+                        }
                         ResizeAlgorithm.Native -> {
                             val bufferedImage = BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB)
                             val g2d = bufferedImage.createGraphics()
                             g2d.drawImage(image, 0, 0, scaledWidth, scaledHeight, null)
                             g2d.dispose()
                             bufferedImage
-                        }
-                        ResizeAlgorithm.Thumbnailator -> {
-                            Thumbnails.of(image).size(scaledWidth, scaledHeight).asBufferedImage()
-                        }
-                        ResizeAlgorithm.Imgscalr -> {
-                            Scalr.resize(image, Scalr.Method.QUALITY, scaledWidth, scaledHeight)
                         }
                     }
 
