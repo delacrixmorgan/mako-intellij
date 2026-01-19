@@ -1,0 +1,18 @@
+[versions]
+kotlin = "2.2.0"
+mako = "1.1.0"
+intellijPlatform = "2.1.0"
+intellijIdea = "2024.3"
+imageio = "3.13.0"
+thumbnailator = "0.4.21"
+imgscalr = "4.2"
+
+[libraries]
+imageio-webp = { module = "com.twelvemonkeys.imageio:imageio-webp", version.ref = "imageio" }
+imageio-core = { module = "com.twelvemonkeys.imageio:imageio-core", version.ref = "imageio" }
+thumbnailator = { module = "net.coobird:thumbnailator", version.ref = "thumbnailator" }
+imgscalr = { module = "org.imgscalr:imgscalr-lib", version.ref = "imgscalr" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+intellijPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "intellijPlatform" }
