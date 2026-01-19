@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.0"
-mako = "1.1.0"
+mako = "1.1.1"
 intellijPlatform = "2.1.0"
 intellijIdea = "2024.3"
 imageio = "3.13.0"
