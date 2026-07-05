@@ -22,11 +22,11 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaCommunity(libs.versions.intellijIdea)
-        instrumentationTools()
     }
 }
 
 intellijPlatform {
+    buildSearchableOptions = false
     pluginConfiguration {
         name = "Mako Android Drawable Importer"
         version = project.version.toString()
